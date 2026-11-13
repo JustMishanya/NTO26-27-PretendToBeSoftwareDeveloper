@@ -10,7 +10,7 @@ public class TextIndicator : Indicator
         tmp_text = GetComponent<TMP_Text>();
         ToIndicate(0);
     }
-    public override void ToIndicate(float value)
+    public override void ToIndicate<T>(T value) 
     {
         tmp_text.text = prefix+value.ToString()+postfix;
     }

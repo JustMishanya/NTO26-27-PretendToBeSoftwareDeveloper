@@ -7,9 +7,9 @@ public class Keyboard : MonoBehaviour
     private Button _button;
     private AudioSource _audioSource;
     [SerializeField] AudioClip clickSound;
-    void Awake()
+    public void Init(Workplace workplace)
     {
-        _workplace = FindFirstObjectByType<Workplace>();
+        _workplace = workplace;
         _button = GetComponent<Button>();
         _audioSource = GetComponent<AudioSource>();
         _audioSource.clip = clickSound;

@@ -3,46 +3,41 @@ using System;
 public class Workplace : MonoBehaviour
 {
     //WP - WorkPoints
-    private float wp;
-    public Action<float> onWPChanged;
-    [SerializeField] float WPThreshold = 10f;
+    [SerializeField, Min(0.7f)] float WPThreshold = 10f;
     private float lastWPTime;
     [SerializeField] Transform uiCanvas;
-    private int penalities;
-    public Action<int> onPenalitiesChanged;
-    public void AddPoints(float additivePoints){
-        Debug.Log("1");
-        if(!G.CanPerformAction()) return;
-        Debug.Log("2");
+    public bool isUsingAI{get;private set;}
+    [SerializeField] float AIThreshold = 0.5f;
+    private float lastAITime;
+    public void AddPoints(float additiveWP){
+        if(!G.CanPerformAction() || isUsingAI) return;
         float curTime = Time.time;
         if (curTime-lastWPTime >= WPThreshold)
         {
-            Debug.Log(3);
-            wp += additivePoints;
-            onWPChanged?.Invoke(wp);
+            G.Instance.AddWP(additiveWP);
             lastWPTime = curTime;
         }
     }
-    public void AddPenalities(int additivePenalities){
-        if(!G.CanPerformAction()) return;
-        penalities += additivePenalities;
-        onPenalitiesChanged?.Invoke(penalities);
-    }
-    
-    void Awake()
+    public void SetAIActive(bool state) {isUsingAI = state;}
+    public void Update()
     {
-        if(uiCanvas != null)
+        float curTime = Time.time;
+        if (G.CanPerformAction() && isUsingAI && curTime-lastAITime>=AIThreshold)
         {
-            Indicator WPCounter = uiCanvas.Find("WorkPoint").GetComponent<Indicator>();
-            if (WPCounter != null) onWPChanged += WPCounter.ToIndicate;
+            G.Instance.AddWP(-1);
+            lastAITime = curTime;
         }
     }
-    void OnDestroy()
+    public void Init()
     {
-        if(uiCanvas != null)
+        foreach (var monitor in FindObjectsByType<Monitor>(FindObjectsSortMode.InstanceID))
         {
-            Indicator WPCounter = uiCanvas.Find("WorkPoint").GetComponent<Indicator>();
-            if(WPCounter != null) onWPChanged -= WPCounter.ToIndicate;
+            monitor.Init(this);
+        }
+        foreach (var keyboard in FindObjectsByType<Keyboard>(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID))
+        {
+            Debug.Log(keyboard);
+            keyboard.Init(this);
         }
     }
 }

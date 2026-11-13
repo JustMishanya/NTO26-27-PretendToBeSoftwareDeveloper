@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 public class GameplayService : Service{
     public GameplayState state {get;private set;} = GameplayState.NotStarted;
@@ -32,15 +34,16 @@ public class GameplayService : Service{
         state = GameplayState.Ended;
         onEnded?.Invoke();
     }
-    public override void OnStart()
+    public override IEnumerator OnStart()
     {
-        return;
+        yield return new WaitForEndOfFrame();
     }
     public override void OnUpdate(float deltaTime)
     {
         if(state != GameplayState.Running) return;
         remainingTime -= deltaTime;
         onTimeChanged?.Invoke(remainingTime);
+        
         if(remainingTime <= 0f)
         {
             remainingTime = 0f;

@@ -8,6 +8,7 @@ public class DebugPanel:MonoBehaviour
     void Awake()
     {
         GameplayService gameplayService = G.Instance.GetService<GameplayService>();
+        EventService eventService = G.Instance.GetService<EventService>();
         GameObject startButton = Instantiate(buttonPrefab,transform);
         startButton.GetComponent<Button>().onClick.AddListener(()=>gameplayService.StartGame(sessionTime));
         startButton.transform.Find("Text").GetComponent<TMP_Text>().text = "Start "+sessionTime.ToString()+"s";
@@ -24,6 +25,7 @@ public class DebugPanel:MonoBehaviour
         gameplayService.onPaused += ()=> Debug.Log("Game Paused");
         gameplayService.onResumed += ()=> Debug.Log("Game resumed");
         gameplayService.onStarted += ()=> Debug.Log("Game started");
+        eventService.onEventStarted += (EventDefintion def)=>Debug.Log("Произошел: "+def.name);
         //gameplayService.onTimeChanged += (float time)=> Debug.Log("Time is timeouting:"+time.ToString());
     }
 }
